@@ -317,11 +317,21 @@
 
         // Preload all images for smooth transitions
         function preloadImages() {
-            imageFiles.forEach((filename, index) => {
-                const img = new Image();
-                img.src = `img/${filename}`;
-                preloadedImages[index] = img;
+            const promises = imageFiles.map((filename, index) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        preloadedImages[index] = img;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${filename}`);
+                        resolve(); // Continue even if one image fails
+                    };
+                    img.src = `img/${filename}`;
+                });
             });
+            return Promise.all(promises);
         }
 
         function showPhrase() {
@@ -407,8 +417,10 @@
 
         // Start the sequence when page loads
         window.addEventListener('DOMContentLoaded', () => {
-            preloadImages(); // Preload all images in the background
-            setTimeout(showPhrase, 500);
+            // Preload all images, then start the slideshow
+            preloadImages().then(() => {
+                setTimeout(showPhrase, 500);
+            });
         });
     </script>
 </body>
