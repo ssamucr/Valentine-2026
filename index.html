@@ -313,6 +313,16 @@
         const FINAL_PHRASE_DELAY = 3000; // Extra time for the last phrase
 
         let currentPhrase = 0;
+        const preloadedImages = [];
+
+        // Preload all images for smooth transitions
+        function preloadImages() {
+            imageFiles.forEach((filename, index) => {
+                const img = new Image();
+                img.src = `img/${filename}`;
+                preloadedImages[index] = img;
+            });
+        }
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
@@ -397,6 +407,7 @@
 
         // Start the sequence when page loads
         window.addEventListener('DOMContentLoaded', () => {
+            preloadImages(); // Preload all images in the background
             setTimeout(showPhrase, 500);
         });
     </script>
