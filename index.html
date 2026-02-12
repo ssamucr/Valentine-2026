@@ -20,6 +20,21 @@
             align-items: center;
             overflow: hidden;
             position: relative;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            transition: background-image 1s ease-in-out;
+        }
+
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 0;
         }
 
         .container {
@@ -29,6 +44,7 @@
             width: 90%;
             position: relative;
             min-height: 200px; /* Minimum height to accommodate absolutely positioned phrases */
+            z-index: 1;
         }
 
         .phrase {
@@ -283,6 +299,14 @@
             { text: "Quiero preguntarte algo importante...", animation: "slide-in-right" }
         ];
 
+        // Map of image files based on phrase number (1-indexed)
+        const imageFiles = [
+            '1.JPG', '2.jpeg', '3.jpeg', '4.jpeg', '5.jpeg', '6.jpeg',
+            '7.JPG', '8.JPG', '9.JPG', '10.JPG', '11.JPG', '12.jpeg',
+            '13.JPG', '14.JPG', '15.jpeg', '16.jpeg', '17.jpeg', '18.JPG',
+            '19.jpeg', '20.JPG', '21.jpeg', '22.jpeg'
+        ];
+
         const ANIMATION_DURATION = 2000; // Time for fade-in/slide-in animation
         const PHRASE_DISPLAY_DURATION = 3000; // Time to display phrase after animation completes
         const FADE_OUT_DURATION = 1000; // Time for fade-out animation
@@ -292,6 +316,11 @@
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
+                // Change background image
+                if (imageFiles[currentPhrase]) {
+                    document.body.style.backgroundImage = `url('img/${imageFiles[currentPhrase]}')`;
+                }
+                
                 // Create and show the new phrase
                 const phraseElement = document.createElement('div');
                 phraseElement.className = `phrase ${phrases[currentPhrase].animation}`;
