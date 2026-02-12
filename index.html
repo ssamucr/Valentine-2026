@@ -107,6 +107,12 @@
         .question {
             display: none;
             opacity: 0;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%;
+            max-width: 800px;
         }
 
         .question.show {
@@ -246,35 +252,41 @@
             { text: "Por eso. Quiero decirte algo...", animation: "fade-in" }
         ];
 
-        const FADE_OUT_DURATION = 1000; // milliseconds
-        const PHRASE_DISPLAY_DURATION = 5000; // milliseconds
-        const FINAL_PHRASE_DELAY = 3000; // milliseconds
+        const ANIMATION_DURATION = 2000; // Time for fade-in/slide-in animation
+        const PHRASE_DISPLAY_DURATION = 3000; // Time to display phrase after animation completes
+        const FADE_OUT_DURATION = 1000; // Time for fade-out animation
+        const FINAL_PHRASE_DELAY = 3000; // Extra time for the last phrase
 
         let currentPhrase = 0;
         let currentElement = null;
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
-                // Fade out and remove the previous phrase
-                if (currentElement) {
-                    currentElement.classList.add('fade-out');
-                    setTimeout(() => {
-                        if (currentElement && currentElement.parentNode) {
-                            currentElement.remove();
-                        }
-                    }, FADE_OUT_DURATION);
-                }
-
                 // Create and show the new phrase
                 const phraseElement = document.createElement('div');
                 phraseElement.className = `phrase ${phrases[currentPhrase].animation}`;
                 phraseElement.textContent = phrases[currentPhrase].text;
                 document.getElementById('phrases').appendChild(phraseElement);
                 
-                currentElement = phraseElement;
                 currentPhrase++;
-                setTimeout(showPhrase, PHRASE_DISPLAY_DURATION);
+                
+                // Wait for: animation + display time, then fade out and show next
+                setTimeout(() => {
+                    // Start fade-out
+                    phraseElement.classList.add('fade-out');
+                    
+                    // Remove element after fade-out completes
+                    setTimeout(() => {
+                        if (phraseElement && phraseElement.parentNode) {
+                            phraseElement.remove();
+                        }
+                    }, FADE_OUT_DURATION);
+                    
+                    // Show next phrase after fade-out completes
+                    setTimeout(showPhrase, FADE_OUT_DURATION);
+                }, ANIMATION_DURATION + PHRASE_DISPLAY_DURATION);
             } else {
+                // After all phrases, wait and then show question
                 setTimeout(() => {
                     if (currentElement) {
                         currentElement.classList.add('fade-out');
