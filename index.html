@@ -27,6 +27,8 @@
             padding: 40px;
             max-width: 800px;
             width: 90%;
+            position: relative;
+            min-height: 200px; /* Minimum height to accommodate absolutely positioned phrases */
         }
 
         .phrase {
@@ -36,6 +38,10 @@
             opacity: 0;
             text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
             line-height: 1.5;
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
         }
 
         .fade-in {
@@ -53,33 +59,48 @@
         @keyframes fadeIn {
             from {
                 opacity: 0;
-                transform: translateY(-20px);
+                transform: translate(-50%, calc(-50% - 20px));
             }
             to {
                 opacity: 1;
-                transform: translateY(0);
+                transform: translate(-50%, -50%);
             }
         }
 
         @keyframes slideInLeft {
             from {
                 opacity: 0;
-                transform: translateX(-100px);
+                transform: translate(calc(-50% - 100px), -50%);
             }
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translate(-50%, -50%);
             }
         }
 
         @keyframes slideInRight {
             from {
                 opacity: 0;
-                transform: translateX(100px);
+                transform: translate(calc(-50% + 100px), -50%);
             }
             to {
                 opacity: 1;
-                transform: translateX(0);
+                transform: translate(-50%, -50%);
+            }
+        }
+
+        .fade-out {
+            animation: fadeOut 1s ease-out forwards;
+        }
+
+        @keyframes fadeOut {
+            from {
+                opacity: 1;
+                transform: translate(-50%, -50%);
+            }
+            to {
+                opacity: 0;
+                transform: translate(-50%, calc(-50% - 20px));
             }
         }
 
@@ -225,22 +246,44 @@
             { text: "Por eso. Quiero decirte algo...", animation: "fade-in" }
         ];
 
+        const FADE_OUT_DURATION = 1000; // milliseconds
+        const PHRASE_DISPLAY_DURATION = 5000; // milliseconds
+        const FINAL_PHRASE_DELAY = 3000; // milliseconds
+
         let currentPhrase = 0;
+        let currentElement = null;
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
+                // Fade out and remove the previous phrase
+                if (currentElement) {
+                    currentElement.classList.add('fade-out');
+                    setTimeout(() => {
+                        if (currentElement && currentElement.parentNode) {
+                            currentElement.remove();
+                        }
+                    }, FADE_OUT_DURATION);
+                }
+
+                // Create and show the new phrase
                 const phraseElement = document.createElement('div');
                 phraseElement.className = `phrase ${phrases[currentPhrase].animation}`;
                 phraseElement.textContent = phrases[currentPhrase].text;
                 document.getElementById('phrases').appendChild(phraseElement);
                 
+                currentElement = phraseElement;
                 currentPhrase++;
-                setTimeout(showPhrase, 3000);
+                setTimeout(showPhrase, PHRASE_DISPLAY_DURATION);
             } else {
                 setTimeout(() => {
-                    document.getElementById('phrases').style.display = 'none';
-                    document.getElementById('question').classList.add('show');
-                }, 2000);
+                    if (currentElement) {
+                        currentElement.classList.add('fade-out');
+                    }
+                    setTimeout(() => {
+                        document.getElementById('phrases').style.display = 'none';
+                        document.getElementById('question').classList.add('show');
+                    }, FADE_OUT_DURATION);
+                }, FINAL_PHRASE_DELAY);
             }
         }
 
