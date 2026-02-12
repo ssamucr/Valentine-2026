@@ -286,7 +286,8 @@
                     if (!isLastPhrase) {
                         setTimeout(showPhrase, FADE_OUT_DURATION);
                     } else {
-                        // After last phrase fades out, wait extra time then show question
+                        // After last phrase fades out, wait FADE_OUT_DURATION for fade to complete
+                        // plus FINAL_PHRASE_DELAY for extra pause before showing question
                         setTimeout(() => {
                             document.getElementById('phrases').style.display = 'none';
                             document.getElementById('question').classList.add('show');
