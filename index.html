@@ -258,7 +258,6 @@
         const FINAL_PHRASE_DELAY = 3000; // Extra time for the last phrase
 
         let currentPhrase = 0;
-        let currentElement = null;
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
@@ -268,6 +267,7 @@
                 phraseElement.textContent = phrases[currentPhrase].text;
                 document.getElementById('phrases').appendChild(phraseElement);
                 
+                const isLastPhrase = currentPhrase === phrases.length - 1;
                 currentPhrase++;
                 
                 // Wait for: animation + display time, then fade out and show next
@@ -282,20 +282,17 @@
                         }
                     }, FADE_OUT_DURATION);
                     
-                    // Show next phrase after fade-out completes
-                    setTimeout(showPhrase, FADE_OUT_DURATION);
-                }, ANIMATION_DURATION + PHRASE_DISPLAY_DURATION);
-            } else {
-                // After all phrases, wait and then show question
-                setTimeout(() => {
-                    if (currentElement) {
-                        currentElement.classList.add('fade-out');
+                    // Show next phrase or question after fade-out completes
+                    if (!isLastPhrase) {
+                        setTimeout(showPhrase, FADE_OUT_DURATION);
+                    } else {
+                        // After last phrase fades out, wait extra time then show question
+                        setTimeout(() => {
+                            document.getElementById('phrases').style.display = 'none';
+                            document.getElementById('question').classList.add('show');
+                        }, FADE_OUT_DURATION + FINAL_PHRASE_DELAY);
                     }
-                    setTimeout(() => {
-                        document.getElementById('phrases').style.display = 'none';
-                        document.getElementById('question').classList.add('show');
-                    }, FADE_OUT_DURATION);
-                }, FINAL_PHRASE_DELAY);
+                }, ANIMATION_DURATION + PHRASE_DISPLAY_DURATION);
             }
         }
 
