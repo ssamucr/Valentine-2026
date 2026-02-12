@@ -313,6 +313,26 @@
         const FINAL_PHRASE_DELAY = 3000; // Extra time for the last phrase
 
         let currentPhrase = 0;
+        const preloadedImages = [];
+
+        // Preload all images for smooth transitions
+        function preloadImages() {
+            const promises = imageFiles.map((filename, index) => {
+                return new Promise((resolve, reject) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        preloadedImages[index] = img;
+                        resolve();
+                    };
+                    img.onerror = () => {
+                        console.warn(`Failed to load image: ${filename}`);
+                        resolve(); // Continue even if one image fails
+                    };
+                    img.src = `img/${filename}`;
+                });
+            });
+            return Promise.all(promises);
+        }
 
         function showPhrase() {
             if (currentPhrase < phrases.length) {
@@ -397,7 +417,10 @@
 
         // Start the sequence when page loads
         window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(showPhrase, 500);
+            // Preload all images, then start the slideshow
+            preloadImages().then(() => {
+                setTimeout(showPhrase, 500);
+            });
         });
     </script>
 </body>
